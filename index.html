@@ -203,6 +203,105 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2022/06/03/glibc_2.23/" target="_self">
+          <img src="/img/fengmian.png" srcset="/img/loading.gif" lazyload alt="Glibc_2.23堆利用">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/06/03/glibc_2.23/" target="_self">
+          Glibc_2.23堆利用
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2022/06/03/glibc_2.23/" target="_self">
+        <div>
+          
+          前言:关于我为什么要写这篇博客，最近发现自己基础很薄弱，很久很久都没又好好的沉下心来去学习了，所以就打算好好总结一下堆利用 目前打算尽自己所能的一点一点写下去，从glibc2.23到glibc2.35,太难的利用手法可能我也很难写下来，先尽力的写一下常见的off_by_one,uaf这些常见的吧，至于能写到什么程度我也不知道。 GLIBC2.23_off_by_one
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-06-03 21:03" pubdate>
+              2022-06-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2022/05/30/login_normal/" target="_self">
+          <img src="/img/fengmian.png" srcset="/img/loading.gif" lazyload alt="">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/05/30/login_normal/" target="_self">
+          
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2022/05/30/login_normal/" target="_self">
+        <div>
+          
+          login_normal思路：需要先绕过检查，然后登录root，随后往mmap出来的内存里写入shellcode就行，绕过方法写在exp里了 漏洞点：需要先将unk—202024置一，这里写入shellcode即可  exp: 1234567891011121314151617181920212223242526272829303132333435from pwn import *from Lib
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-05-30 20:26" pubdate>
+              2022-05-30
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/05/24/destdog/" target="_self">
           <img src="/img/fengmian.png" srcset="/img/loading.gif" lazyload alt="Dest0g3迎新赛wp及其复现">
         </a>
@@ -307,7 +406,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://github.com/gxher?tab=repositories" target="_blank" rel="nofollow noopener"><span>Try yout best!</span></a> 
+       <a href="https://github.com/gxher?tab=repositories" target="_blank" rel="nofollow noopener"><span>Try your best!</span></a> 
     </div>
   
   
