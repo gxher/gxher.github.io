@@ -16,21 +16,21 @@
   <meta name="author" content="gxh">
   <meta name="keywords" content="">
   
-    <meta name="description" content="1234title: large &amp;&amp; unsroted bin attackcategories: PWN    unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attac">
+    <meta name="description" content="unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove">
 <meta property="og:type" content="article">
-<meta property="og:title" content="gxh&#39;s blog">
+<meta property="og:title" content="unsorted_bin &amp;&amp;largebin_attack">
 <meta property="og:url" content="http://gxher.github.io/2022/07/01/largebin_attack/index.html">
 <meta property="og:site_name" content="gxh&#39;s blog">
-<meta property="og:description" content="1234title: large &amp;&amp; unsroted bin attackcategories: PWN    unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attac">
+<meta property="og:description" content="unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-01T10:30:16.240Z">
-<meta property="article:modified_time" content="2022-07-01T10:33:15.760Z">
+<meta property="article:modified_time" content="2022-07-01T10:37:42.177Z">
 <meta property="article:author" content="gxh">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>gxh&#39;s blog</title>
+  <title>unsorted_bin &amp;&amp;largebin_attack - gxh&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -181,7 +181,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text=""></span>
+            <span id="subtitle" data-typed-text="unsorted_bin &amp;&amp;largebin_attack"></span>
           
         </div>
 
@@ -204,7 +204,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.4k 字
+          3.3k 字
         
       </span>
     
@@ -215,7 +215,7 @@
         
         
         
-          29 分钟
+          28 分钟
         
       </span>
     
@@ -253,15 +253,11 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">unsorted_bin &amp;&amp;largebin_attack</h1>
             
             <div class="markdown-body">
               
-              <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br><span class="hljs-attr">title:</span> <span class="hljs-string">large</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">unsroted</span> <span class="hljs-string">bin</span> <span class="hljs-string">attack</span><br><span class="hljs-attr">categories:</span> <span class="hljs-string">PWN</span><br><br></code></pre></td></tr></table></figure>
-
-
-
-<h1 id="unsorted-bin-attack-amp-amp-largebin-attack"><a href="#unsorted-bin-attack-amp-amp-largebin-attack" class="headerlink" title="unsorted_bin attack &amp;&amp;largebin_attack"></a>unsorted_bin attack &amp;&amp;largebin_attack</h1><p>之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz</p>
+              <h1 id="unsorted-bin-attack-amp-amp-largebin-attack"><a href="#unsorted-bin-attack-amp-amp-largebin-attack" class="headerlink" title="unsorted_bin attack &amp;&amp;largebin_attack"></a>unsorted_bin attack &amp;&amp;largebin_attack</h1><p>之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz</p>
 <h2 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted_bin attack"></a>unsorted_bin attack</h2><p>先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* remove from unsorted list */</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim))<br>  malloc_printerr (<span class="hljs-string">&quot;malloc(): corrupted unsorted chunks 3&quot;</span>);<br>unsorted_chunks (av)-&gt;bk = bck;<br>bck-&gt;fd = unsorted_chunks (av);<br></code></pre></td></tr></table></figure>
 
@@ -302,6 +298,27 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
   
 </div>
 
@@ -311,7 +328,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div></div>
+      <div>unsorted_bin &amp;&amp;largebin_attack</div>
       <div>http://gxher.github.io/2022/07/01/largebin_attack/</div>
     </div>
     <div class="license-meta">
@@ -358,8 +375,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="">
-                        <span class="hidden-mobile"></span>
+                      <a href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="ARMPWN入门">
+                        <span class="hidden-mobile">ARMPWN入门</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
