@@ -1,0 +1,666 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="gxh">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1234title: large &amp;&amp; unsroted bin attackcategories: PWN    unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gxh&#39;s blog">
+<meta property="og:url" content="http://gxher.github.io/2022/07/01/largebin_attack/index.html">
+<meta property="og:site_name" content="gxh&#39;s blog">
+<meta property="og:description" content="1234title: large &amp;&amp; unsroted bin attackcategories: PWN    unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attac">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-07-01T10:30:16.240Z">
+<meta property="article:modified_time" content="2022-07-01T10:33:15.760Z">
+<meta property="article:author" content="gxh">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>gxh&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"gxher.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>gxh&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/back.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-01 18:30" pubdate>
+          2022年7月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              
+              <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br><span class="hljs-attr">title:</span> <span class="hljs-string">large</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">unsroted</span> <span class="hljs-string">bin</span> <span class="hljs-string">attack</span><br><span class="hljs-attr">categories:</span> <span class="hljs-string">PWN</span><br><br></code></pre></td></tr></table></figure>
+
+
+
+<h1 id="unsorted-bin-attack-amp-amp-largebin-attack"><a href="#unsorted-bin-attack-amp-amp-largebin-attack" class="headerlink" title="unsorted_bin attack &amp;&amp;largebin_attack"></a>unsorted_bin attack &amp;&amp;largebin_attack</h1><p>之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz</p>
+<h2 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted_bin attack"></a>unsorted_bin attack</h2><p>先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* remove from unsorted list */</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim))<br>  malloc_printerr (<span class="hljs-string">&quot;malloc(): corrupted unsorted chunks 3&quot;</span>);<br>unsorted_chunks (av)-&gt;bk = bck;<br>bck-&gt;fd = unsorted_chunks (av);<br></code></pre></td></tr></table></figure>
+
+<p>这个攻击其实是用在摘链的时候，如果我们可以控制 unsorted_bin中的bk指针，我们可以写入任意地址（姑且称为target），当我们malloc掉这个unsorted_chunk时，我们的target+0x10地址出就会被修改为 main_arena+offest的地址，其实也就是libc中的地址。效果就是修改任意地址为一个较大的数。</p>
+<p>在GLIBC2.29及以后，int_malloc()函数源码中加入了这段</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c">mchunkptr next = chunk_at_offset (victim, size);<br><br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (chunksize_nomask (next) &lt; <span class="hljs-number">2</span> * SIZE_SZ)<br>           || __glibc_unlikely (chunksize_nomask (next) &gt; av-&gt;system_mem))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): invalid next size (unsorted)&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely ((prev_size (next) &amp; ~(SIZE_BITS)) != size))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): mismatching next-&gt;prev_size (unsorted)&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim)<br>           || __glibc_unlikely (victim-&gt;fd != unsorted_chunks (av)))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): unsorted double linked list corrupted&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (prev_inuse (next)))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): invalid next-&gt;prev_inuse (unsorted)&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>​	malloc时增加了以下四项检查：</p>
+<ul>
+<li>下一个chunk的size是否在合理区间</li>
+<li>下一个chunk的prevsize是否等于victim的size</li>
+<li>检查unsortedbin双向链表的完整性</li>
+<li>下一个chunk的previnuse标志位是否为0</li>
+</ul>
+<p>也就是说，在2.29以后unsorted_bin attack基本也退出历史舞台了，很少能用的到了，基本被large_bin attck所替代了，检查双向链表的完整性，即检擦了victim的fd,也检查了bck的fd，所以要想使用这个手法，要提前知道heap地址和libc地址才可以。</p>
+<p>此外，house of force 在2.29以后也退出了历史舞台，原因是增加了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-keyword">if</span> (__glibc_unlikely (size &gt; av-&gt;system_mem))<span class="hljs-comment">//0x21000</span><br>        malloc_printerr (<span class="hljs-string">&quot;malloc(): corrupted top size&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>需要检查top_chunk的size,需要小于等于 system_mems,所以基本失效了。</p>
+<h2 id="large-bin-attack"><a href="#large-bin-attack" class="headerlink" title="large_bin attack"></a>large_bin attack</h2><p>large_bin attack主要是在unsorted—bin里的chunk，进入large_bin的时候，出现的问题，一共两种常见的利用方式。</p>
+<ul>
+<li><p>在申请largebin的过程中，伪造largebin的bk_nextsize，实现非预期内存申请。</p>
+</li>
+<li><p>在largebin插入的过程中，伪造largebin的bk_nextsize以及bk，实现任意地址写堆地址。</p>
+</li>
+</ul>
+<h3 id="申请时利用："><a href="#申请时利用：" class="headerlink" title="申请时利用："></a>申请时利用：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> ((victim = first (bin)) != bin<br>          &amp;&amp; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) chunksize_nomask (victim)<br>            &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb))<br>            &#123;<br>              victim = victim-&gt;bk_nextsize;<br>              <span class="hljs-keyword">while</span> (((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size = chunksize (victim)) &lt;<br>                      (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb)))<br>                victim = victim-&gt;bk_nextsize; <span class="hljs-comment">//寻找堆块</span><br>                <br>......<br>​<br>              remainder_size = size - nb;<br>              unlink (av, victim, bck, fwd); <span class="hljs-comment">//unlin</span><br></code></pre></td></tr></table></figure>
+
+<p>只要目标地方符合unlink就可以通过检查了。</p>
+<h3 id="插入时利用（任意地址写入堆地址）"><a href="#插入时利用（任意地址写入堆地址）" class="headerlink" title="插入时利用（任意地址写入堆地址）"></a>插入时利用（任意地址写入堆地址）</h3><p>在我们将chunk1放入large_bin后，我们通过修改chunk1的bk_next_size为target_addr - 0x20，此时 unsorted_bin中有一个large_chunk，我称之为chunk2,但是chunk2的地址size要大于chunk1的size，同时两个size在同一个bin的index范围内。此时我们再malloc任意size的chunk即可将chunk2链入chunk1中去，此时我们target_addr的内容，就会被修改成chunk2的地址。</p>
+<p>看以下how2heap</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// gcc -g -no-pie largebin.c -o largebin</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var1 = <span class="hljs-number">0</span>;<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var2 = <span class="hljs-number">0</span>;<br><br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var1 (%p): %ld\n&quot;</span>, &amp;stack_var1, stack_var1);<br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var2 (%p): %ld\n\n&quot;</span>, &amp;stack_var2, stack_var2);<br> <br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x320</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x400</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x400</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br> <br>     <span class="hljs-built_in">free</span>(p1);<br>     <span class="hljs-built_in">free</span>(p2);<br><br>     <span class="hljs-type">void</span>* p4 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br> <br>     <span class="hljs-built_in">free</span>(p3);<br> <br>     p2[<span class="hljs-number">-1</span>] = <span class="hljs-number">0x3f1</span>;<br>     p2[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;<br>     p2[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>     p2[<span class="hljs-number">1</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var1 - <span class="hljs-number">2</span>);<br>     p2[<span class="hljs-number">3</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var2 - <span class="hljs-number">4</span>);<br> <br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br> <br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var1 (%p): %p\n&quot;</span>, &amp;stack_var1, (<span class="hljs-type">void</span> *)stack_var1);<br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var2 (%p): %p\n&quot;</span>, &amp;stack_var2, (<span class="hljs-type">void</span> *)stack_var2);<br> <br>     <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br> &#125;<br><br></code></pre></td></tr></table></figure>
+
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>http://gxher.github.io/2022/07/01/largebin_attack/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gxh</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年7月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/gxher?tab=repositories" target="_blank" rel="nofollow noopener"><span>Try your best!</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

