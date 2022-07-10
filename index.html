@@ -209,15 +209,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2022/07/01/largebin_attack/" target="_self">
-          Unsorted_bin &amp;&amp;Largebin_attack
+        <a href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" target="_self">
+          GLIBC版本更新的一些变动
         </a>
       </h1>
 
-      <a class="index-excerpt" href="/2022/07/01/largebin_attack/" target="_self">
+      <a class="index-excerpt" href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" target="_self">
         <div>
           
-          unsorted_bin attack &amp;&amp;largebin_attack之所以把这两个放一起，其实就是因为他们本质上所起的作用是一样的，都是修改指定位置的数据，和任意地址写有一定区别，我称之为任意地址修改（orz unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove
+          glibc2.27（小版本变动没记） 增加了tcache 再malloc_consolidate中  12&#x2F;*新增：检查从fastbin中取出的chunk的大小是否满足fastbin的索引，house-of-rabbit无法使用  *&#x2F;unsigned int idx &#x3D; fastbin_index (chunksize (p));   在unlink中  123&#x2F;*新增：检查其下一个chunk的
         </div>
       </a>
 
@@ -225,8 +225,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2022-07-01 18:41" pubdate>
-              2022-07-01
+            <time datetime="2022-07-10 23:53" pubdate>
+              2022-07-10
             </time>
           </div>
         
