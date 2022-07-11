@@ -379,7 +379,7 @@
       <a class="index-excerpt" href="/2022/06/24/2.23GLIBC%E5%86%85%E5%AD%98%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" target="_self">
         <div>
           
-          写在前面大部分的分析都写在了注释里，参考了一些师傅的博客和CTFwiki 一些自己容易忘记的小知识 mmap出来的堆空间和libc的基地址的偏移是固定的，所以可以通过这种手段泄露libc基地址  堆空间大概长这样：   还有就是关于bins数组，fastbin是单独的，其他的0—1是unsorted_bin,2-63是small_bin,64-128是largebin   malloc__libc
+          写在前面大部分的分析都写在了注释里，参考了一些师傅的博客和CTFwiki 概述malloc_fastbin: malloc函数执行时,如果size在fastbin范围内，且fastbin内有合适的chunk,直接返回，否则去unsorted   malloc_small_bin: malloc函数执行时,如果size在smallbin范围内，且smallbin内有合适的chunk，直接返回,否则去
         </div>
       </a>
 
