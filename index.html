@@ -209,6 +209,60 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2022/07/20/%E8%93%9D%E5%B8%BD%E6%9D%AFwp/" target="_self">
+          2022蓝帽杯 初赛pwn wp及其复现
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2022/07/20/%E8%93%9D%E5%B8%BD%E6%9D%AFwp/" target="_self">
+        <div>
+          
+          escape_shellcode(pie_orw_shellcode) 写入heap_mem+170地址后，情况除rip外的所有寄存器，然后执行shellcode。 难点在于没有基地址，无法打印bss段中的flag。 注意的点，堆地址高5位和基地址相同，从基地址开始0x1000地读 write系统调用会返回给rcx寄存器，下一条指令的地址（堆地址），堆地址和bss段前几位一样的，所有可以采用爆破，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-07-20 22:40" pubdate>
+              2022-07-20
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" target="_self">
           GLIBC版本更新的一些变动
         </a>
