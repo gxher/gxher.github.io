@@ -1,6 +1,6 @@
-http://gxher.github.io/about/index-1.html
-http://gxher.github.io/tag/index.html
+http://gxher.github.io/tags/index.html
 http://gxher.github.io/categories/index.html
+http://gxher.github.io/about/index-1.html
 http://gxher.github.io/2022/07/01/Large_ubsorted/
 http://gxher.github.io/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/
 http://gxher.github.io/2022/05/24/destdog/
